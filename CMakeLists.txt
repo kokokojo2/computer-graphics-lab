@@ -8,7 +8,7 @@ add_subdirectory(glfw)
 include_directories(glfw/include/GLFW)
 
 set(SOURCE_FILES main.cpp)
-set(HEADER_FILES shader.h utils/ShaderProgram/ShaderProgram.cpp utils/ShaderProgram/ShaderProgram.h utils/VertexArrayObjectManager/VertexArrayObjectManager.cpp utils/VertexArrayObjectManager/VertexArrayObjectManager.h utils/TransformationManager.cpp utils/TransformationManager.h)
+set(HEADER_FILES shader.h utils/ShaderProgram/ShaderProgram.cpp utils/ShaderProgram/ShaderProgram.h utils/VertexArrayObjectManager/VertexArrayObjectManager.cpp utils/VertexArrayObjectManager/VertexArrayObjectManager.h utils/TransformationManager/TransformationManager.cpp utils/TransformationManager/TransformationManager.h utils/CameraManager/CameraManager.cpp utils/CameraManager/CameraManager.h)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
