@@ -11,36 +11,29 @@ TransformationManager::TransformationManager(float translationSensitivity) {
 }
 
 void TransformationManager::moveObject(unsigned int direction) {
-    std::cout << direction << std::endl;
+    glm::vec3 directionVector;
     switch (direction) {
         case right:
-            transformationMatrix = glm::translate(
-                    transformationMatrix,
-                    glm::vec3(1.0f * translationSensitivity, 0.0f, 0.0f)
-                    );
+            directionVector = glm::vec3(1.0f * translationSensitivity, 0.0f, 0.0f);
             break;
         case left:
-            transformationMatrix = glm::translate(
-                    transformationMatrix,
-                    glm::vec3(-1.0f * translationSensitivity, 0.0f, 0.0f)
-            );
+            directionVector = glm::vec3(-1.0f * translationSensitivity, 0.0f, 0.0f);
             break;
         case up:
-            transformationMatrix = glm::translate(
-                    transformationMatrix,
-                    glm::vec3(0.0f, 1.0f * translationSensitivity, 0.0f)
-            );
+            directionVector = glm::vec3(0.0f, 1.0f * translationSensitivity, 0.0f);
             break;
         case down:
-            transformationMatrix = glm::translate(
-                    transformationMatrix,
-                    glm::vec3(0.0f, -1.0f * translationSensitivity, 0.0f)
-            );
+            directionVector = glm::vec3(0.0f, -1.0f * translationSensitivity, 0.0f);
             break;
         default:
             std::cout << "Unknown direction for construction translation matrix." << std::endl;
             break;
     }
+
+    transformationMatrix = glm::translate(
+            transformationMatrix,
+            directionVector
+    );
 }
 
 const glm::mat4 &TransformationManager::getTransformationMatrix() const {
