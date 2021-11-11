@@ -17,7 +17,6 @@ const unsigned int SCREEN_HIGHT = 800;
 const std::string VERTEX_SHADER_PATH = "..\\shaders\\vertex.glsl";
 const std::string FRAGMENT_SHADER_PATH = "..\\shaders\\frag.glsl";
 
-
 float vertices[] = {
         -0.8f, 0.36f, 0.0f,
         -0.8f, 0.05f, 0.0f,
@@ -61,7 +60,6 @@ unsigned int vertexBufferObjConfiguration() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
     return vertexBufferObject;
-    //glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 unsigned int elementBufferObjConfiguration() {

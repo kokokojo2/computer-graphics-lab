@@ -8,7 +8,6 @@ ShaderProgram::ShaderProgram() {
 }
 
 bool ShaderProgram::addFromSourceString(const char *shader, const int shaderType) {
-        std::cout << shader;
         unsigned int shaderId = glCreateShader(shaderType);
 
         glShaderSource(shaderId, 1, &shader, nullptr);
