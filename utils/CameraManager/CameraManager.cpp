@@ -37,7 +37,6 @@ void CameraManager::changeCameraDirection(float xOffset, float yOffset) {
     xOffset *= this->mouseSensitivity;
     yOffset *= this->mouseSensitivity;
 
-    std::cout << "changed" << std::endl;
     this->yaw += xOffset;
     this->pitch += yOffset;
 

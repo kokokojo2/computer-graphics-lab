@@ -27,4 +27,4 @@ public:
 };
 
 
-#endif //OPENGLSETUPFROMGLFW_TRANSFORMATIONMANAGER_H
+#endif

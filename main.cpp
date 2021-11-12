@@ -15,11 +15,21 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window, TransformationManager* transformationManager,  CameraManager* cameraManager);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
+// screen dimensions
 const unsigned int SCREEN_WIDTH = 1200;
 const unsigned int SCREEN_HIGHT = 1200;
+
+// paths to shader files
 const std::string VERTEX_SHADER_PATH = "..\\shaders\\vertex.glsl";
 const std::string FRAGMENT_SHADER_PATH = "..\\shaders\\frag.glsl";
 
+// 3d graph plot settings
+const int FUNCTION_START = 0, FUNCTION_STOP = 30;
+const float FUNCTION_STEP = 1;
+const int CHUNK_SIZE =  ((FUNCTION_STOP - FUNCTION_START) / FUNCTION_STEP );
+int size = 2 * CHUNK_SIZE * CHUNK_SIZE * 3;
+
+// mouse settings
 bool firstMouse = true;
 glm::vec2 lastMousePos = glm::vec2(SCREEN_HIGHT / 2.0f, SCREEN_HIGHT / 2.0f);
 
@@ -31,6 +41,7 @@ auto* cameraManager = new CameraManager(
         0.1
 );
 
+// cube configurations
 float cubeVertices [] = {
         -0.5, -0.5, 0.5, // 0
         0.5, -0.5, 0.5, // 1
@@ -86,6 +97,7 @@ unsigned int CubeElementBufferObjConfiguration() {
     return elementBufferObject;
 }
 
+// dodecahedron configurations
 float dodecahedronVertices[] = {
         1, 1, 1, // 0
         1, 1, -1, // 1
@@ -183,6 +195,7 @@ unsigned int DodecahedronElementBufferObjConfiguration() {
     return elementBufferObject;
 }
 
+// floor configurations
 float floorVertices[] {
     50, 0, 50,
     -50, 0 ,50,
@@ -218,12 +231,8 @@ unsigned int FloorElementBufferObjConfiguration() {
     return elementBufferObject;
 }
 
+// initial configuration of model, view and projection matrices
 void configureSpaceMatrices(TransformationManager* transformationManager) {
-    transformationManager->view  = glm::translate(
-            transformationManager->view,
-            glm::vec3(0.0f, 0.0f, -3.0f)
-            );
-
     transformationManager->projection = glm::perspective(
             glm::radians(45.0f),
             (float)SCREEN_WIDTH / (float)SCREEN_HIGHT,
@@ -231,33 +240,41 @@ void configureSpaceMatrices(TransformationManager* transformationManager) {
             );
 }
 
+
+// plotting functions
 float f(float x, float z) {
     return sqrt(x) + sqrt(z);
 }
 
 void getGraphVerticesArray(float *vertices, int start, int stop, float step) {
     int index = 0;
-    for (float i = start; i < stop; i += step) {
-        vertices[index] = i; // x
-        index++;
-        vertices[index] = f(i, 0); // y
-        index++;
-        vertices[index] = 0; // z
-        index++;
+    for (float j = start; j < stop; j += step) {
+        for (float i = start; i < stop; i += step) {
+            vertices[index] = i; // x
+            index++;
+            vertices[index] = f(i, j); // y
+            index++;
+            vertices[index] = j; // z
+            index++;
+        }
+    }
+
+    for (float j = start; j < stop; j += step) {
+        for (float i = start; i < stop; i += step) {
+            vertices[index] = j; // x
+            index++;
+            vertices[index] = f(i, j); // y
+            index++;
+            vertices[index] = i; // z
+            index++;
+        }
     }
 }
 
+
 unsigned int GraphVertexBufferObjConfiguration() {
-    int start = 0, stop = 5;
-    float step = 0.5;
-    int size = ((stop - start) / step ) * 3;
-
     float graphIndexArr [size];
-    getGraphVerticesArray(graphIndexArr, 0, 5, 0.5);
-
-    for (int i = 0; i < size; i++) {
-        std::cout << graphIndexArr[i] << " ";
-    }
+    getGraphVerticesArray(graphIndexArr, FUNCTION_START, FUNCTION_STOP, FUNCTION_STEP);
 
     unsigned int vertexBufferObject;
     glGenBuffers(1, &vertexBufferObject);
@@ -271,18 +288,13 @@ unsigned int GraphVertexBufferObjConfiguration() {
     return vertexBufferObject;
 }
 
-int main() {
-    int start = 0, stop = 5;
-    float step = 0.5;
-    int size = ((stop - start) / step ) * 3;
-
-    float graphIndexArr [size];
-    getGraphVerticesArray(graphIndexArr, 0, 5, 0.5);
-
-    for (int i = 0; i < size; i++) {
-        std::cout << graphIndexArr[i] << " ";
+void drawGraph() {
+    for(int i = 0; i < size; i += CHUNK_SIZE) {
+        glDrawArrays(GL_LINE_STRIP, i, CHUNK_SIZE);
     }
+}
 
+int main() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -345,7 +357,7 @@ int main() {
 
         shaderProgram->activate();
 
-
+        CubeVertexArrayObj->bind();
         transformationManager->model = glm::translate(
                 transformationManager->model,
                 glm::vec3( 5.0f,  0.0f,  0.0f)
@@ -353,11 +365,11 @@ int main() {
 
         shaderProgram->passUniform4Matrix("model", transformationManager->model);
         shaderProgram->passUniform4Vec("color", glm::vec4(0.0f, 1.0f, 1.0f, 1.0f));
-        CubeVertexArrayObj->bind();
         glDrawElements(GL_TRIANGLES, sizeof(cubeIndices), GL_UNSIGNED_INT, nullptr);
         CubeVertexArrayObj->unbind();
 
 
+        DodecahedronVertexArrayObj->bind();
         transformationManager->model = glm::translate(
                 glm::mat4(1.0f),
                 glm::vec3( -5.0f,  0.0f,  0.0f)
@@ -365,25 +377,26 @@ int main() {
         shaderProgram->passUniform4Matrix("model", transformationManager->model);
         shaderProgram->passUniform4Vec("color", glm::vec4(0.5f, 0.0f, 0.5f, 1.0f));
 
-        DodecahedronVertexArrayObj->bind();
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         glDrawElements(GL_TRIANGLES, sizeof(dodecahedronIndices), GL_UNSIGNED_INT, nullptr);
         DodecahedronVertexArrayObj->unbind();
 
 
+        FloorVertexArrayObj->bind();
         transformationManager->model = glm::translate(
                 glm::mat4(1.0f),
                 glm::vec3( 0.0f,  -2.0f,  0.0f)
         );
         shaderProgram->passUniform4Matrix("model", transformationManager->model);
         shaderProgram->passUniform4Vec("color", glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
-        FloorVertexArrayObj->bind();
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         glDrawElements(GL_TRIANGLES, sizeof(floorIndices), GL_UNSIGNED_INT, nullptr);
         FloorVertexArrayObj->unbind();
 
+
+        GraphVertexArrayObj->bind();
         transformationManager->model = glm::translate(
                 glm::mat4(1.0f),
                 glm::vec3( 0.0f,  1.0f,  0.0f)
@@ -391,9 +404,9 @@ int main() {
         shaderProgram->passUniform4Matrix("model", transformationManager->model);
         shaderProgram->passUniform4Vec("color", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
-        GraphVertexArrayObj->bind();
-        glDrawArrays(GL_LINE_STRIP, 0, 10); // TODO: hardcoded
+        drawGraph();
         GraphVertexArrayObj->unbind();
+
         glfwSwapBuffers(mainWindow);
         glfwPollEvents();
     }
@@ -444,6 +457,5 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     lastMousePos.x = xpos;
     lastMousePos.y = ypos;
 
-    std::cout << xOffset << " " << yOffset << std::endl;
     cameraManager->changeCameraDirection(xOffset, yOffset);
 }
