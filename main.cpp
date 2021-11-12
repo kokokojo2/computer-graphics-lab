@@ -24,7 +24,7 @@ bool firstMouse = true;
 glm::vec2 lastMousePos = glm::vec2(SCREEN_HIGHT / 2.0f, SCREEN_HIGHT / 2.0f);
 
 auto* cameraManager = new CameraManager(
-        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 2.0f, 10.0f),
         glm::vec3(0.0f, 0.0f, -1.0f),
         glm::vec3(0.0f, 1.0f,  0.0f),
         0.005,
@@ -62,6 +62,29 @@ unsigned int cubeIndices[] = {
         0, 1, 5,
         0, 4, 5
 };
+
+
+unsigned int CubeVertexBufferObjConfiguration() {
+    unsigned int vertexBufferObject;
+    glGenBuffers(1, &vertexBufferObject);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+    return vertexBufferObject;
+}
+
+unsigned int CubeElementBufferObjConfiguration() {
+    unsigned int elementBufferObject;
+    glGenBuffers(1, &elementBufferObject);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferObject);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndices), cubeIndices, GL_STATIC_DRAW);
+
+    return elementBufferObject;
+}
 
 float dodecahedronVertices[] = {
         1, 1, 1, // 0
@@ -150,19 +173,6 @@ unsigned int DodecahedronVertexBufferObjConfiguration() {
     return vertexBufferObject;
 }
 
-unsigned int CubeVertexBufferObjConfiguration() {
-    unsigned int vertexBufferObject;
-    glGenBuffers(1, &vertexBufferObject);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
-    return vertexBufferObject;
-}
-
 
 unsigned int DodecahedronElementBufferObjConfiguration() {
     unsigned int elementBufferObject;
@@ -173,22 +183,42 @@ unsigned int DodecahedronElementBufferObjConfiguration() {
     return elementBufferObject;
 }
 
-unsigned int CubeElementBufferObjConfiguration() {
+float floorVertices[] {
+    50, 0, 50,
+    -50, 0 ,50,
+    50, 0 , -50,
+    -50, 0, -50
+};
+
+unsigned int floorIndices[] {
+    0, 1, 2,
+    1, 2, 3
+};
+
+unsigned int FloorVertexBufferObjConfiguration() {
+    unsigned int vertexBufferObject;
+    glGenBuffers(1, &vertexBufferObject);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(floorVertices), floorVertices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+    return vertexBufferObject;
+}
+
+
+unsigned int FloorElementBufferObjConfiguration() {
     unsigned int elementBufferObject;
     glGenBuffers(1, &elementBufferObject);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferObject);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndices), cubeIndices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(floorIndices), floorIndices, GL_STATIC_DRAW);
 
     return elementBufferObject;
 }
 
 void configureSpaceMatrices(TransformationManager* transformationManager) {
-    transformationManager->model = glm::rotate(
-            transformationManager->model,
-            glm::radians(-55.0f),
-            glm::vec3(1.0f, 0.0f, 0.0f)
-            );
-
     transformationManager->view  = glm::translate(
             transformationManager->view,
             glm::vec3(0.0f, 0.0f, -3.0f)
@@ -201,8 +231,58 @@ void configureSpaceMatrices(TransformationManager* transformationManager) {
             );
 }
 
+float f(float x, float z) {
+    return sqrt(x) + sqrt(z);
+}
+
+void getGraphVerticesArray(float *vertices, int start, int stop, float step) {
+    int index = 0;
+    for (float i = start; i < stop; i += step) {
+        vertices[index] = i; // x
+        index++;
+        vertices[index] = f(i, 0); // y
+        index++;
+        vertices[index] = 0; // z
+        index++;
+    }
+}
+
+unsigned int GraphVertexBufferObjConfiguration() {
+    int start = 0, stop = 5;
+    float step = 0.5;
+    int size = ((stop - start) / step ) * 3;
+
+    float graphIndexArr [size];
+    getGraphVerticesArray(graphIndexArr, 0, 5, 0.5);
+
+    for (int i = 0; i < size; i++) {
+        std::cout << graphIndexArr[i] << " ";
+    }
+
+    unsigned int vertexBufferObject;
+    glGenBuffers(1, &vertexBufferObject);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(graphIndexArr), graphIndexArr, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+    return vertexBufferObject;
+}
 
 int main() {
+    int start = 0, stop = 5;
+    float step = 0.5;
+    int size = ((stop - start) / step ) * 3;
+
+    float graphIndexArr [size];
+    getGraphVerticesArray(graphIndexArr, 0, 5, 0.5);
+
+    for (int i = 0; i < size; i++) {
+        std::cout << graphIndexArr[i] << " ";
+    }
+
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -240,30 +320,80 @@ int main() {
     DodecahedronVertexArrayObj->configureVBOObject(DodecahedronVertexBufferObjConfiguration);
     DodecahedronVertexArrayObj->configureEBOObject(DodecahedronElementBufferObjConfiguration);
 
+    auto* FloorVertexArrayObj = new VertexArrayObjectManager();
+    FloorVertexArrayObj->configureVBOObject(FloorVertexBufferObjConfiguration);
+    FloorVertexArrayObj->configureEBOObject(FloorElementBufferObjConfiguration);
+
+    auto* GraphVertexArrayObj = new VertexArrayObjectManager();
+    GraphVertexArrayObj->configureVBOObject(GraphVertexBufferObjConfiguration);
+
     auto* transformationManager = new TransformationManager(0.001);
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     configureSpaceMatrices(transformationManager);
+
     while (!glfwWindowShouldClose(mainWindow)) {
         processInput(mainWindow, transformationManager, cameraManager);
-        shaderProgram->passUniform4Matrix("transform", transformationManager->getTransformationMatrix());
         shaderProgram->passUniform4Matrix("model", transformationManager->model);
         shaderProgram->passUniform4Matrix("view", cameraManager->getLookAtMatrix());
         shaderProgram->passUniform4Matrix("projection", transformationManager->projection);
 
-        glClearColor(0.96f, 0.5f, 0.15f, 1.0f);
+        glClearColor(0.75f, 0.75f, 0.75f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glEnable(GL_DEPTH_TEST);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shaderProgram->activate();
 
+
+        transformationManager->model = glm::translate(
+                transformationManager->model,
+                glm::vec3( 5.0f,  0.0f,  0.0f)
+                );
+
+        shaderProgram->passUniform4Matrix("model", transformationManager->model);
+        shaderProgram->passUniform4Vec("color", glm::vec4(0.0f, 1.0f, 1.0f, 1.0f));
         CubeVertexArrayObj->bind();
         glDrawElements(GL_TRIANGLES, sizeof(cubeIndices), GL_UNSIGNED_INT, nullptr);
         CubeVertexArrayObj->unbind();
 
+
+        transformationManager->model = glm::translate(
+                glm::mat4(1.0f),
+                glm::vec3( -5.0f,  0.0f,  0.0f)
+        );
+        shaderProgram->passUniform4Matrix("model", transformationManager->model);
+        shaderProgram->passUniform4Vec("color", glm::vec4(0.5f, 0.0f, 0.5f, 1.0f));
+
         DodecahedronVertexArrayObj->bind();
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
         glDrawElements(GL_TRIANGLES, sizeof(dodecahedronIndices), GL_UNSIGNED_INT, nullptr);
         DodecahedronVertexArrayObj->unbind();
 
+
+        transformationManager->model = glm::translate(
+                glm::mat4(1.0f),
+                glm::vec3( 0.0f,  -2.0f,  0.0f)
+        );
+        shaderProgram->passUniform4Matrix("model", transformationManager->model);
+        shaderProgram->passUniform4Vec("color", glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
+        FloorVertexArrayObj->bind();
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glDrawElements(GL_TRIANGLES, sizeof(floorIndices), GL_UNSIGNED_INT, nullptr);
+        FloorVertexArrayObj->unbind();
+
+        transformationManager->model = glm::translate(
+                glm::mat4(1.0f),
+                glm::vec3( 0.0f,  1.0f,  0.0f)
+        );
+        shaderProgram->passUniform4Matrix("model", transformationManager->model);
+        shaderProgram->passUniform4Vec("color", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+
+        GraphVertexArrayObj->bind();
+        glDrawArrays(GL_LINE_STRIP, 0, 10); // TODO: hardcoded
+        GraphVertexArrayObj->unbind();
         glfwSwapBuffers(mainWindow);
         glfwPollEvents();
     }
@@ -278,21 +408,25 @@ void processInput(GLFWwindow *window, TransformationManager* transformationManag
         glfwSetWindowShouldClose(window, true);
 
     if (glfwGetKey(window,GLFW_KEY_W) == GLFW_PRESS) {
-        //transformationManager->moveObject(TransformationManager::up);
         cameraManager->moveCamera(CameraManager::front);
     }
     if (glfwGetKey(window,GLFW_KEY_S) == GLFW_PRESS) {
-        //transformationManager->moveObject(TransformationManager::down);
         cameraManager->moveCamera(CameraManager::back);
     }
     if (glfwGetKey(window,GLFW_KEY_D) == GLFW_PRESS) {
-        //transformationManager->moveObject(TransformationManager::right);
         cameraManager->moveCamera(CameraManager::right);
 
     }
     if (glfwGetKey(window,GLFW_KEY_A) == GLFW_PRESS) {
-        //transformationManager->moveObject(TransformationManager::left);
         cameraManager->moveCamera(CameraManager::left);
+    }
+
+    if (glfwGetKey(window,GLFW_KEY_P) == GLFW_PRESS) {
+        transformationManager->changeProjectionMatrix(TransformationManager::perspective, SCREEN_WIDTH, SCREEN_HIGHT);
+    }
+
+    if (glfwGetKey(window,GLFW_KEY_O) == GLFW_PRESS) {
+        transformationManager->changeProjectionMatrix(TransformationManager::orthographic, SCREEN_WIDTH, SCREEN_HIGHT);
     }
 }
 

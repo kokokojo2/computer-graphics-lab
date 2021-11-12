@@ -39,3 +39,18 @@ void TransformationManager::moveObject(unsigned int direction) {
 const glm::mat4 &TransformationManager::getTransformationMatrix() const {
     return transformationMatrix;
 }
+
+void TransformationManager::changeProjectionMatrix(unsigned int mode, int width, int hight) {
+    switch (mode) {
+        case perspective:
+            projection = glm::perspective(
+                    glm::radians(45.0f),
+                    (float)width / (float)hight,
+                    0.1f, 100.0f
+            );
+            break;
+        case orthographic:
+            projection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 100.0f);
+            break;
+    }
+}

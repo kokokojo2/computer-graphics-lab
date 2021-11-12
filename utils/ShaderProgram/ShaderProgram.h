@@ -29,6 +29,7 @@ public:
     void passUniform4Matrix(const std::string& variableName, glm::mat4 matrix);
     void activate() const;
     char* getInfoLog();
+    void passUniform4Vec(const std::string &variableName, glm::vec4 vector);
 };
 
 

@@ -87,3 +87,9 @@ void ShaderProgram::passUniform4Matrix(const std::string &variableName, glm::mat
     unsigned int transformLoc = glGetUniformLocation(this->getId(), variableName.c_str());
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(matrix));
 }
+
+void ShaderProgram::passUniform4Vec(const std::string &variableName, glm::vec4 vector) {
+    unsigned int transformLoc = glGetUniformLocation(this->getId(), variableName.c_str());
+    glUniform4fv(transformLoc, 1, glm::value_ptr(vector));
+}
+
